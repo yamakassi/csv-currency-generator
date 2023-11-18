@@ -2,6 +2,7 @@ package com.yamakassi;
 
 import com.opencsv.CSVWriter;
 import java.io.FileWriter;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,18 +36,18 @@ public class Main {
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 
         executorService.scheduleAtFixedRate(() -> {
-            Long timestamp = new Date().getTime();
-            String csvFilePath = outputDirectory + "/" + BASE_FILE_NAME + "_" + timestamp.toString() + ".csv";
+            Timestamp timestamp  = new Timestamp(new Date().getTime());
+            String csvFilePath = outputDirectory + "/" + BASE_FILE_NAME + "_" + timestamp.getTime() + ".csv";
 
-            System.out.println(cryptoCurrency);
             try (CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFilePath))) {
-                String[] header = {"currency", "price"};
+                String[] header = {"currency", "price", "timestamp"};
                 csvWriter.writeNext(header);
                 for (Map.Entry<String, Double> entry : cryptoCurrency.entrySet()) {
                     double currentPrice = entry.getValue();
                     double newPrice = newPrice(currentPrice);
                     entry.setValue(newPrice);
-                    String[] data = {entry.getKey(), entry.getValue().toString()};
+                    String[] data = {entry.getKey(), entry.getValue().toString(), String.valueOf(timestamp)};
+                    System.out.println(entry.getKey()+":"+ entry.getValue().toString()+":"+ timestamp);
                     csvWriter.writeNext(data);
                 }
                 System.out.println("WRITE");
